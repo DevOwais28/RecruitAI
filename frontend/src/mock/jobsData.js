@@ -1,0 +1,8 @@
+export default [
+  { id: 1, title: 'Senior Frontend Engineer', location: 'Remote', department: 'Engineering', type: 'Full-time', salary: '$120k – $160k', status: 'Active', applicants: 47, posted: '2024-10-22', mandatorySkills: ['React', 'TypeScript', 'Tailwind CSS'], preferredSkills: ['Next.js', 'Testing Library', 'GraphQL'] },
+  { id: 2, title: 'Backend Engineer', location: 'San Francisco, CA', department: 'Engineering', type: 'Full-time', salary: '$130k – $170k', status: 'Active', applicants: 38, posted: '2024-10-25', mandatorySkills: ['Node.js', 'PostgreSQL', 'REST APIs'], preferredSkills: ['Docker', 'Redis', 'Kafka'] },
+  { id: 3, title: 'Product Designer', location: 'New York, NY', department: 'Design', type: 'Full-time', salary: '$110k – $145k', status: 'Active', applicants: 29, posted: '2024-10-18', mandatorySkills: ['Figma', 'User Research', 'Design Systems'], preferredSkills: ['Framer', 'Illustrator'] },
+  { id: 4, title: 'DevOps Engineer', location: 'Remote', department: 'Infrastructure', type: 'Full-time', salary: '$125k – $165k', status: 'Active', applicants: 22, posted: '2024-10-28', mandatorySkills: ['AWS', 'Terraform', 'CI/CD'], preferredSkills: ['Kubernetes', 'Ansible'] },
+  { id: 5, title: 'Data Scientist', location: 'Austin, TX', department: 'Data', type: 'Full-time', salary: '$135k – $175k', status: 'Paused', applicants: 15, posted: '2024-10-10', mandatorySkills: ['Python', 'Machine Learning', 'SQL'], preferredSkills: ['PyTorch', 'Spark'] },
+  { id: 6, title: 'Marketing Manager', location: 'Remote', department: 'Marketing', type: 'Full-time', salary: '$95k – $125k', status: 'Closed', applicants: 52, posted: '2024-09-15', mandatorySkills: ['SEO', 'Content Strategy', 'Analytics'], preferredSkills: ['HubSpot', 'Paid Ads'] },
+];

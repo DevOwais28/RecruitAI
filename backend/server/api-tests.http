@@ -1,0 +1,36 @@
+### 1. Login to get a fresh token
+POST http://localhost:4000/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "recruiter@example.com",
+    "password": "StrongPass123"
+}
+
+### 2. Upload a new CV
+POST http://localhost:4000/api/candidates/upload
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicmVjcnVpdGVyIiwiaWF0IjoxNzkzODc3NjIyLCJleHAiOjE3OTM5NjQwMjIsInN1YiI6Ijg1MTAyYjI0LWI1MTktNDA0Zi05MGVmLTIwZjlhODQ2NWNiZiJ9.Quv6ZKO2BTruBr2ALHd5Mimqmk0WGYR-h8GFjrdQrfA
+Content-Type: multipart/form-data; boundary=MyBoundary
+
+--MyBoundary
+Content-Disposition: form-data; name="jobId"
+
+bb5d9641-743f-4d7f-b642-e5b519df281e
+--MyBoundary
+Content-Disposition: form-data; name="resume"; filename="resume.pdf"
+Content-Type: application/pdf
+
+< C:/Users/ra920/Downloads/Owais_Ahmed_Data_Entry_Operator_CV.pdf
+--MyBoundary--
+
+### Get Ranked Candidates
+GET http://localhost:4000/api/candidates/jobs/bb5d9641-743f-4d7f-b642-e5b519df281e/ranked
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicmVjcnVpdGVyIiwiaWF0IjoxNzkzNzcyNTQ0LCJleHAiOjE3OTM4NTg5NDQsInN1YiI6Ijg1MTAyYjI0LWI1MTktNDA0Zi05MGVmLTIwZjlhODQ2NWNiZiJ9.E6KWYN2MRZ1rBqpgUQmHrOOCLh42ASXz6WgLu_wxCXE
+
+### Get secure candidate resume download URL
+GET http://localhost:4000/api/candidates/10c91aa8-43a5-4b75-a70f-de2b17ad5035/resume
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicmVjcnVpdGVyIiwiaWF0IjoxNzkzNzcyNTQ0LCJleHAiOjE3OTM4NTg5NDQsInN1YiI6Ijg1MTAyYjI0LWI1MTktNDA0Zi05MGVmLTIwZjlhODQ2NWNiZiJ9.E6KWYN2MRZ1rBqpgUQmHrOOCLh42ASXz6WgLu_wxCXE
+
+
+GET http://localhost:4000/api/jobs
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicmVjcnVpdGVyIiwiaWF0IjoxNzkzODMyOTAxLCJleHAiOjE3OTM5MTkzMDEsInN1YiI6Ijg1MTAyYjI0LWI1MTktNDA0Zi05MGVmLTIwZjlhODQ2NWNiZiJ9.gZqQGeHM2hK5cMn41Ov1Q7NUXNcKhYzIAG5hFVJuGb4
