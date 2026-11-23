@@ -67,6 +67,8 @@ services:
       dockerfile: Dockerfile
     container_name: recruitment-backend
     restart: unless-stopped
+    dns:
+      - 8.8.8.8
     env_file:
       - ./backend/server/.env
     environment:
