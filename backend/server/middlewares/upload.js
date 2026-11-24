@@ -24,4 +24,4 @@ const uploadResume = multer({
   },
 });
 
-export default uploadResume;
+export {uploadResume};
