@@ -3,8 +3,8 @@ import pg from "pg";
 
 const { Pool } = pg;
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+export const pool = new Pool({
+  connectionString: process.env.DATABASE_URL || process.env.DB_URL,
   ssl: {
     rejectUnauthorized: false, // Required for Neon cloud connections
   },
