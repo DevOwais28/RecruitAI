@@ -41,6 +41,17 @@ export const downloadResume = async (
 
         const buffer = Buffer.from(await response.arrayBuffer());
 
+        console.log(`[Cloudinary Download] Downloaded ${originalFilename}: ${buffer.length} bytes from URL: ${url.slice(0, 80)}...`);
+
+        // Check if returned content is HTML/error from Cloudinary instead of a PDF/DOCX binary
+        if (buffer.length < 500) {
+            const preview = buffer.toString("utf8");
+            if (preview.includes("<html") || preview.includes("Error") || preview.includes("Unauthorized")) {
+                console.error("[Cloudinary Download Error Response]:", preview);
+                throw new Error(`Cloudinary returned non-binary content: ${preview.slice(0, 100)}`);
+            }
+        }
+
         await fs.writeFile(tempPath, buffer);
 
         return tempPath;
