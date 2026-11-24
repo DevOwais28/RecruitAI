@@ -1,36 +1,28 @@
-import { Redis } from "ioredis";
+// Upstash Redis HTTP REST client
 
-const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
-
-let redisClient = null;
-
-if (redisUrl) {
-    try {
-        redisClient = new Redis(redisUrl, {
-            enableOfflineQueue: false,
-            maxRetriesPerRequest: 1,
-            lazyConnect: true,
-        });
-
-        redisClient.on("error", (error) => {
-            console.warn("[Redis Warning]", error.message);
-        });
-
-        redisClient.connect().catch(() => {});
-    } catch (err) {
-        console.warn("[Redis] Failed to initialize Redis:", err.message);
-    }
-} else {
-    console.log("[Redis] REDIS_URL not provided, running without cache invalidation.");
-}
+const restUrl = process.env.UPSTASH_REDIS_REST_URL;
+const restToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
 export const redis = {
     async del(key) {
-        if (!redisClient) return;
+        if (!restUrl || !restToken) {
+            return;
+        }
+
         try {
-            await redisClient.del(key);
-        } catch (error) {
-            console.warn(`[Redis del failed for ${key}]:`, error.message);
+            const endpoint = `${restUrl.replace(/\/$/, "")}/del/${encodeURIComponent(key)}`;
+            const response = await fetch(endpoint, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${restToken}`,
+                },
+            });
+
+            if (!response.ok) {
+                console.warn(`[Upstash Redis] DEL failed with status: ${response.status}`);
+            }
+        } catch (err) {
+            console.warn("[Upstash Redis] HTTP request failed:", err.message);
         }
     },
 };
