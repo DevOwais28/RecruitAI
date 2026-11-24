@@ -5,7 +5,8 @@ let connection;
 let channel;
 
 export const connectRabbitMQ = async () => {
-    connection = await amqp.connect(process.env.rabbitmq_URL);
+    const rabbitUrl = process.env.RABBITMQ_URL || process.env.rabbitmq_URL;
+    connection = await amqp.connect(rabbitUrl);
 
     channel = await connection.createConfirmChannel();
     // Main CV processing queue
