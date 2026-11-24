@@ -5,13 +5,7 @@ let connection;
 let channel;
 
 export const connectRabbitMQ = async () => {
-    connection = await amqp.connect({
-        protocol: "amqp",
-        hostname: process.env.RABBITMQ_HOST || "localhost",
-        port: Number(process.env.RABBITMQ_PORT) || 5672,
-        username: process.env.RABBITMQ_USER,
-        password: process.env.RABBITMQ_PASSWORD,
-    });
+    connection = await amqp.connect(process.env.rabbitmq_URL);
 
     channel = await connection.createConfirmChannel();
     // Main CV processing queue

@@ -4,13 +4,7 @@ let connection;
 let channel;
 
 export const connectRabbitMQ = async () => {
-    connection = await amqp.connect({
-        protocol: "amqp",
-        hostname: process.env.RABBITMQ_HOST || "localhost",
-        port: Number(process.env.RABBITMQ_PORT) || 5672,
-        username: process.env.RABBITMQ_USER,
-        password: process.env.RABBITMQ_PASSWORD,
-    });
+    connection = await amqp.connect(process.env.rabbitmq_URL);
 
     // Create a publisher confirmation channel.
     channel = await connection.createConfirmChannel();
