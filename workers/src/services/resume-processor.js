@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import { pool } from "./database.js";
 import { downloadResume } from "./resume-download.js";
 import { extractResumeText } from "./resume-extractor.js";
-import { analyzeResume, validateResume } from "./ollama.js";
+import { analyzeResume, validateResume } from "./ai.service.js";
 import { evaluateCandidate } from "./candidate-evaluator.js";
 import { redis } from "./redis.js";
 
