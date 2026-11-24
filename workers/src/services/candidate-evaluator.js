@@ -1,6 +1,6 @@
 
 import { pool } from "./database.js";
-import { evaluateEducation } from "./ollama.js";
+import { evaluateEducation } from "./ai.service.js";
 
 const normalizeSkill = (skill) =>
     skill.toLowerCase().trim().replace(/\s+/g, " ");
