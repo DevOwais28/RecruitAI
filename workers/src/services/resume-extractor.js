@@ -11,15 +11,19 @@ export const extractResumeText = async (filePath, originalFilename) => {
 
     if (extension === ".pdf") {
         const buffer = await fs.readFile(filePath);
+        console.log(`[Resume Extractor] Reading PDF file, buffer length: ${buffer.length}`);
         const result = await pdf(buffer);
 
-        return result.text.trim();
+        const extracted = (result?.text || "").trim();
+        console.log(`[Resume Extractor] PDF extraction completed. Pages: ${result?.numpages}, Extracted length: ${extracted.length}`);
+        return extracted;
     }
 
     if (extension === ".docx") {
         const result = await mammoth.extractRawText({ path: filePath });
-
-        return result.value.trim();
+        const extracted = (result?.value || "").trim();
+        console.log(`[Resume Extractor] DOCX extraction completed. Extracted length: ${extracted.length}`);
+        return extracted;
     }
 
     throw new Error("Unsupported resume format.");

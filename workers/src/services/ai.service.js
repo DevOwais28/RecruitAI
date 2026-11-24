@@ -1,7 +1,16 @@
-// AI service using Groq API as primary provider with automatic fallback to Ollama.
+// AI service using Groq API as primary provider with multi-model fallback and local Ollama fallback.
 
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
-const DEFAULT_GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
+
+// Popular Groq models to try in sequence if one returns 404/model_not_found
+const GROQ_MODELS = [
+    process.env.GROQ_MODEL,
+    "openai/gpt-oss-120b",
+    "openai/gpt-oss-20b",
+    "llama-3.3-70b-versatile",
+    "llama-3.1-8b-instant",
+    "qwen/qwen3.8-27b",
+].filter(Boolean);
 
 const getOllamaUrl = () =>
     `${(process.env.OLLAMA_BASE_URL || "http://localhost:11434").replace(/\/$/, "")}/api/generate`;
@@ -9,7 +18,6 @@ const getOllamaUrl = () =>
 const cleanJsonResponse = (text) => {
     if (!text) return "";
     let cleaned = text.trim();
-    // Remove markdown code fences if model returned them
     if (cleaned.startsWith("```json")) {
         cleaned = cleaned.replace(/^```json\s*/i, "").replace(/\s*```$/, "");
     } else if (cleaned.startsWith("```")) {
@@ -19,14 +27,9 @@ const cleanJsonResponse = (text) => {
 };
 
 /**
- * Call Groq Chat Completions API with JSON mode
+ * Call Groq API with a specific model
  */
-const callGroq = async (prompt, systemPrompt = "You are an AI assistant that outputs only valid JSON.") => {
-    const apiKey = process.env.GROQ_API_KEY;
-    if (!apiKey) {
-        throw new Error("GROQ_API_KEY is not configured.");
-    }
-
+const requestGroqModel = async (modelName, prompt, systemPrompt, apiKey) => {
     const response = await fetch(GROQ_API_URL, {
         method: "POST",
         headers: {
@@ -34,7 +37,7 @@ const callGroq = async (prompt, systemPrompt = "You are an AI assistant that out
             "Authorization": `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-            model: DEFAULT_GROQ_MODEL,
+            model: modelName,
             messages: [
                 { role: "system", content: systemPrompt },
                 { role: "user", content: prompt },
@@ -46,7 +49,9 @@ const callGroq = async (prompt, systemPrompt = "You are an AI assistant that out
 
     if (!response.ok) {
         const errText = await response.text().catch(() => "");
-        throw new Error(`Groq API error (${response.status}): ${errText}`);
+        const error = new Error(`Groq API error (${response.status}): ${errText}`);
+        error.status = response.status;
+        throw error;
     }
 
     const data = await response.json();
@@ -56,6 +61,38 @@ const callGroq = async (prompt, systemPrompt = "You are an AI assistant that out
     }
 
     return cleanJsonResponse(content);
+};
+
+/**
+ * Call Groq trying configured model first, then known available fallback models
+ */
+const callGroq = async (prompt, systemPrompt = "You are an AI assistant that outputs only valid JSON.") => {
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey) {
+        throw new Error("GROQ_API_KEY is not configured.");
+    }
+
+    let lastError = null;
+
+    // Deduplicate models
+    const candidateModels = Array.from(new Set(GROQ_MODELS));
+
+    for (const model of candidateModels) {
+        try {
+            console.log(`[AI] Attempting Groq with model: ${model}...`);
+            const result = await requestGroqModel(model, prompt, systemPrompt, apiKey);
+            return result;
+        } catch (err) {
+            lastError = err;
+            console.warn(`[AI Warning] Groq model ${model} failed (${err.message}). Trying next candidate...`);
+            // If it's authentication error (401), trying other models won't help
+            if (err.status === 401) {
+                throw err;
+            }
+        }
+    }
+
+    throw lastError || new Error("All Groq models failed.");
 };
 
 /**
@@ -93,11 +130,10 @@ const executeWithFallback = async (prompt, systemPrompt, taskName) => {
     // 1. Try Groq (Production standard)
     if (process.env.GROQ_API_KEY) {
         try {
-            console.log(`[AI] Running ${taskName} via Groq (${DEFAULT_GROQ_MODEL})...`);
             const raw = await callGroq(prompt, systemPrompt);
             return JSON.parse(raw);
         } catch (groqError) {
-            console.warn(`[AI Warning] Groq failed for ${taskName}: ${groqError.message}. Falling back to Ollama...`);
+            console.warn(`[AI Warning] Groq completely failed for ${taskName}: ${groqError.message}. Falling back to Ollama...`);
         }
     } else {
         console.warn(`[AI Warning] GROQ_API_KEY missing. Falling back directly to Ollama for ${taskName}...`);
